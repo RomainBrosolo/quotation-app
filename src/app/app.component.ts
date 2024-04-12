@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { doc, updateDoc } from 'firebase/firestore';
 import {
-  ActivatedRoute,
   Router,
   RouterLink,
   RouterLinkActive,
@@ -11,15 +10,10 @@ import { Quotation, Status } from './core/models/quotation.model';
 import { CommonModule } from '@angular/common';
 import { User } from './core/models/user.model';
 import { FormsModule } from '@angular/forms';
-import { Storage } from '@angular/fire/storage';
-import {
-  Firestore,
-  collection,
-  collectionData,
-  getDocs,
-} from '@angular/fire/firestore';
+import { Firestore, collection, collectionData } from '@angular/fire/firestore';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { FirebaseService } from './core/services/firebase.service';
 
 @Component({
   selector: 'app-root',
@@ -53,18 +47,9 @@ export class AppComponent implements OnInit, OnDestroy {
     status: Status.progress,
   };
 
-  constructor(
-    private router: Router,
-    private _snackBar: MatSnackBar,
-    private route: ActivatedRoute,
-    private storage: Storage
-  ) {}
+  constructor(private router: Router, private _snackBar: MatSnackBar) {}
 
   ngOnInit(): void {
-    // console.log(this.route.snapshot.paramMap);
-    // this.route.params.subscribe((params) => {
-    //   console.log('params =', params['id']);
-    // });
     this._getData();
   }
 
@@ -76,13 +61,9 @@ export class AppComponent implements OnInit, OnDestroy {
       }
     );
 
-    console.log('list =', this.quotationsCollectiondata);
-
     const usersCollection = collection(this.firestore, 'Utilisateurs');
-
-    const snapshot = await getDocs(usersCollection);
-    snapshot.docs.forEach((user) => {
-      this.usersCollectiondata.push({ ...user.data(), id: user.id });
+    this.subUsers = collectionData(usersCollection).subscribe((users: any) => {
+      this.usersCollectiondata = users;
     });
 
     this.carSelected = this.quotationsCollectiondata.find(
@@ -107,6 +88,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this._snackBar.open('Sucess', '', {
       horizontalPosition: 'center',
       verticalPosition: 'top',
+      duration: 1000,
     });
   }
 
@@ -122,6 +104,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subQuotations.unsubscribe();
-    // this.subUsers.unsubscribe();
+    this.subUsers.unsubscribe();
   }
 }

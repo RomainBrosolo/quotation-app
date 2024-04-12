@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Firestore, doc, updateDoc } from 'firebase/firestore';
 import { Quotation, Status } from '../models/quotation.model';
+import { collection } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root',
@@ -14,5 +15,11 @@ export class FirebaseService {
     await updateDoc(docRef, { ...quotation });
   }
 
-  async getQuotations() {}
+  getQuotations() {
+    return collection(this.firestore, 'quotation');
+  }
+
+  getUsers() {
+    return collection(this.firestore, 'Utilisateurs');
+  }
 }
