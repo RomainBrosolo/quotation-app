@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "argus-c8ee0": {
+      "hosting": {
+        "app-quotation": [
+          "fo-quotation-113"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "argus-c8ee0"
+  }
+}
